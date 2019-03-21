@@ -1,0 +1,34 @@
+home:
+    path: /
+    controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: home.html.twig
+        maxAge: 86400
+    methods: GET
+logout:
+    path: /logout
+rpc_relay:
+    path: /rpc_relay
+    controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: rpc_relay.html.twig
+        maxAge: 86400
+    methods: GET
+nelmio_security:
+    path:     /nelmio/csp/report
+    defaults: { _controller: nelmio_security.csp_reporter_controller:indexAction }
+    methods:  [POST]
+privacy:
+    path: /privacy
+    controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: privacy.html.twig
+        maxAge: 86400
+    methods: GET
+terms:
+    path: /terms
+    controller: Symfony\Bundle\FrameworkBundle\Controller\TemplateController
+    defaults:
+        template: terms.html.twig
+        maxAge: 86400
+    methods: GET

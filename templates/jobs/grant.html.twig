@@ -1,0 +1,162 @@
+{#
+ # @license https://www.gnu.org/licenses/agpl-3.0.en.html AGPL-3.0+
+ #
+ # This file is part of Team Drive Migrator, an application for migrating
+ # files into Team Drives.
+ # Copyright (C) 2019  Anime Critics United, Inc. <webmaster@castlepointanime.com>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+ #
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #}
+
+{% extends "base.html.twig" %}
+
+{% block breadcrumb %}
+	<ol class="breadcrumb" aria-label="breadcrumb">
+    <li class="breadcrumb-item"><a href="{{ url('job_new') }}">Jobs</a></li>
+    <li class="breadcrumb-item active" aria-current="page">{{ job.getName() }}</li>
+  </ol>
+{% endblock %}
+
+{% block title %}Grant access for Team Drive migration{% endblock %}
+
+{% block body %}
+	{{ form_start(form) }}
+		{{ form_errors(form) }}
+
+		{% if form.vars.value.getGrantTime() %}
+			<div class="alert alert-info">
+	      You've already given approval for this migration.
+	    </div>
+    {% endif %}
+
+		<p>An administrator is migrating corporate data into <a href="https://gsuite.google.com/learning-center/products/drive/get-started-team-drive/#!/">Team Drive</a>. To do this, they are requesting access to certain corporate files owned by your personal Google account. Most likely, you created these files before a corporate Google account was created for you, or there may be files you accidentally created with your personal account.
+
+		{% if not form.vars.value.getGrantTime() %}
+			<div class="alert alert-danger">
+			  This action is permanent. Please read carefully.
+			</div>
+		{% endif %}
+
+		<h2>What will this migration do?</h2>
+		<p>If this process is confusing or you are not sure about granting access for any reason, please reach out to your administrator <em>before</em> granting access below.
+		<ol>
+			<li>It will find all Google Drive files owned by you, <strong>only in the folder below</strong>.
+			<li>This website will then wait until all other users have granted access.
+			<li>These files will be moved into a corporation-owned Team Drive.
+			<li>Once moved, your personal Google account will no longer have access to these files.
+			<li>Once moved, your corporate Google account <em>may</em> have access to these files. Contact the administrator if you are not sure.
+		</ol>
+
+		<p>This migration will affect the Google Drive folder listed below (and all folders and files contained within):
+
+		<div class="card bg-light border-dark mb-3">
+			<div class="card-header" id="collapseHead">
+				<div class="container-fluid">
+					<div class="row justify-content-between">
+						<div class="col">
+	      			<h3 class="card-title mb-0">Job: {{ job.getName() }}</h3>
+	      		</div>
+	      		<div class="col flex-grow-0">
+	      			<i class="fas fa-chevron-down" aria-hidden="true"></i>
+	      		</div>
+	      	</div>
+	      </div>
+	      <button class="btn-outline-light position-absolute h-100 w-100"
+	              style="top: 0; left: 0; background-color: transparent;"
+	              data-toggle="collapse"
+	              data-target="#collapseBody"
+	              aria-label="expand panel"
+	              aria-expanded="true"
+	              aria-controls="collapseBody">
+	      </button>
+	    </div>
+			<div id="collapseBody" class="collapse" aria-labelledby="collapseHead">
+				<div class="card-body">
+					<p>{{ job.getDescription() }}
+
+					<div class="alert alert-warning" role="alert">
+					  If you're logged into multiple Google accounts, you may see a permission error. <a href="https://drive.google.com/open?id={{ job.getSourceFolder() }}" target="_blank" rel="noopener noreferrer">Click here</a> to go to Google Drive directly.
+					</div>
+
+					<iframe
+						src="https://drive.google.com/embeddedfolderview?id={{ job.getSourceFolder() }}#list"
+						frameborder="0">
+					</iframe>
+
+					<p>Once you are confident in the details explained above, <strong>click the button below</strong>. If there are any files you believe should not be migrated, contact the administrator before giving access.
+				</div>
+			</div>
+		</div>
+
+		<div class="container-fluid text-center submit-form">
+	    <div class="form-row justify-content-around">
+	    	<div class="col">
+	    		<label for="formGroupExampleInput">
+	    			<h4>
+	    				{% if redirectUrl %}
+			    			<i class="fas fa-info-circle text-info" aria-label="Current Step"></i>
+			    		{% else %}
+			    			<i class="fas fa-check-circle text-success" aria-label="Completed Step"></i>
+			    		{% endif %}
+			    		Step 1
+	    			</h4>
+	    		</label>
+	    		<div class="form-group">
+		    		<a href="{{ redirectUrl ?? '#' }}"
+		    		   {% if redirectUrl %}
+		    		     class="btn btn-primary shadow-sm"
+		    		   {% else %}
+		    		     class="btn btn-outline-secondary disabled"
+		    		     aria-disabled="true"
+		    		   {% endif %}>
+		    			Authorize
+		    		</a>
+		    	</div>
+	    	</div>
+	    	<div class="col" style="font-size: 72px;">
+	    		<i class="fas fa-long-arrow-alt-right"></i>
+	    	</div>
+	    	<div class="col">
+	    		<div class="form-group">
+				    <label for="{{ form.submit.vars.id }}">
+				    	<h4>
+					    	{% if redirectUrl %}
+				    			<i class="fas fa-times-circle text-danger" aria-label="Not Ready"></i>
+				    		{% elseif not form.vars.value.getGrantTime() %}
+				    			<i class="fas fa-info-circle text-info" aria-label="Current Step"></i>
+				    		{% else %}
+				    			<i class="fas fa-check-circle text-success" aria-label="Completed Step"></i>
+				    		{% endif %}
+				    		Step 2
+				    	</h4>
+				    </label>
+				    {{ form_row(form.submit) }}
+				  </div>
+			  </div>
+	  	</div>
+	  </div>
+	{{ form_end(form) }}
+{% endblock %}
+
+{% block stylesheets %}
+	{% cspstyle %}
+	<style type="text/css">
+		iframe {
+			display: block;
+			width: 100%;
+			height: 300px;
+		}
+	</style>
+	{% endcspstyle %}
+{% endblock %}

@@ -1,0 +1,30 @@
+security:
+    providers:
+        fos_userbundle:
+            id: app.user_provider
+    firewalls:
+        dev:
+            pattern: ^/(_(profiler|wdt)|css|images|js)/
+            security: false
+        main:
+            anonymous: ~
+            oauth:
+                resource_owners:
+                    google: "/login/check-google"
+                oauth_user_provider:
+                    service: app.user_provider
+                login_path: /login
+                use_forward: false
+                failure_path: /login
+            logout:
+                path:   /logout
+                target: /
+    access_control:
+        - { path: ^/login, roles: IS_AUTHENTICATED_ANONYMOUSLY }
+        - { path: ^/jobs, roles: ROLE_USER }
+    role_hierarchy:
+        ROLE_RUNNER: ROLE_USER
+        ROLE_ADMIN: ROLE_RUNNER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+    encoders:
+        FOS\UserBundle\Model\UserInterface: bcrypt

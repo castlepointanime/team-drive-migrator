@@ -1,0 +1,94 @@
+{#
+ # @license https://www.gnu.org/licenses/agpl-3.0.en.html AGPL-3.0+
+ #
+ # This file is part of Team Drive Migrator, an application for migrating
+ # files into Team Drives.
+ # Copyright (C) 2019  Anime Critics United, Inc. <webmaster@castlepointanime.com>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+ #
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #}
+
+{% extends "base.html.twig" %}
+
+{% block body %}
+	<div class="jumbotron">
+		<h1 class="display-4">Welcome to CPAC's migrator!</h1>
+
+		<p class="lead">This site is your one-stop shop for migrating your CPAC-related Google Drive
+			files into Team Drive. With a more sensible permissions model, Team Drive helps protect
+			confidential information!
+
+		<hr class="my-4">
+
+		<p>In regular Google Drive, permissions can be difficut to manager. Each folder and file
+			has a different owner, writers, etc. It's not always clear what files a user might have
+			access to, especially with a large number of files. Luckily, Google has launched
+			<a href="https://gsuite.google.com/learning-center/products/drive/get-started-team-drive/">Team Drives</a>,
+			which has a much simpler permissions model. There's only one set of owners, and it's easy
+			to add and remove users at any time.
+
+		<p>So what's the process?</p>
+
+		<div class="container-fluid">
+			<div class="row justify-content-around">
+				<div class="col-xs-6">
+					<div class="card my-4 home-card">
+						<div class="card-body">
+							<h5 class="card-title">Login</h5>
+							<p class="card-text">
+								First, you need to log in with your Google account. This must be the same
+								Google account that owns the Drive folder and Team Drive you are working with.
+							<p><a href="#" class="btn btn-secondary">Go somewhere</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6">
+					<div class="card my-4 home-card">
+						<div class="card-body">
+							<h5 class="card-title">Pick a Drive folder</h5>
+							<p class="card-text">
+								Create a new job, and pick the source Drive folder and the destination Team Drive.
+								Usually only your corporate administrator needs to do this. Most users can skip
+								to the final step.
+							<p><a href="#" class="btn btn-secondary">Learn about Team Drive</a>
+						</div>
+					</div>
+				</div>
+				<div class="col-xs-6">
+					<div class="card my-4 home-card">
+						<div class="card-body">
+							<h5 class="card-title">Get consent from users</h5>
+							<p class="card-text">
+								Finally, you need consent from users. The application will send an email to users
+								that own files in the source folder, and ask for their permission to move their
+								files into Team Drive.
+							<p><a href="mailto:webmaster@castlepointanime.com" class="btn btn-secondary">Email Support</a>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block stylesheets %}
+	{% cspstyle %}
+	<style type="text/css">
+		.home-card {
+			width: 20rem;
+			height: 255px;
+		}
+	</style>
+	{% endcspstyle %}
+{% endblock %}

@@ -1,0 +1,230 @@
+{#
+ # @license https://www.gnu.org/licenses/agpl-3.0.en.html AGPL-3.0+
+ #
+ # This file is part of Team Drive Migrator, an application for migrating
+ # files into Team Drives.
+ # Copyright (C) 2019  Anime Critics United, Inc. <webmaster@castlepointanime.com>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+ #
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #}
+
+{% extends "base.html.twig" %}
+
+{% block title %}Migration jobs{% endblock %}
+
+{% block body %}
+	<h2>Jobs you're a part of</h2>
+		<table class="table">
+	  <thead>
+	    <tr>
+	      <th scope="col">#</th>
+	      <th scope="col">Name</th>
+	      <th scope="col">Description</th>
+	      <th scope="col">Status</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  	{% for grant in grants %}
+		    <tr>
+		      <th scope="row">{{ loop.index }}</th>
+		      <td>{{ grant.getJob().getName() }}</td>
+		      <td>{{ grant.getJob().getDescription() }}</td>
+		      <td>
+		      	{% if grant.getGrantTime() %}
+		      		Approved {{ grant.getGrantTime() | date('Y-m-d') }}
+		      	{% else %}
+			      	<a href="{{ url('job_grant', {'id': grant.getJob().getId()}) }}"
+			      		 class="btn btn-primary">
+			      		Approve
+		      		</a>
+		      	{% endif %}
+		      </td>
+		    </tr>
+		  {% endfor %}
+	  </tbody>
+	</table>
+
+	<h2>Jobs you've created</h2>
+	<table class="table">
+	  <thead>
+	    <tr>
+	      <th scope="col">#</th>
+	      <th scope="col">Name</th>
+	      <th scope="col">Description</th>
+	    </tr>
+	  </thead>
+	  <tbody>
+	  	{% for job in jobs %}
+		    <tr>
+		      <th scope="row">{{ loop.index }}</th>
+		      <td>{{ job.getName() }}</td>
+		      <td>{{ job.getDescription() }}</td>
+		    </tr>
+		  {% endfor %}
+	  </tbody>
+	</table>
+
+
+	{% if newJobRedirectUrl %}
+		<a href="{{ newJobRedirectUrl }}"
+			 class="btn btn-primary btn-lg shadow-lg app-fab"
+			 data-toggle="tooltip"
+			 title="Requires additional Google Drive permissions"
+	     aria-label="Create a new job">
+			<i class="fas fa-plus"></i>
+		</a>
+	{% else %}
+		<button type="button"
+		        data-toggle="modal"
+		        data-target="#create-job-modal"
+	          class="btn btn-primary btn-lg shadow-lg app-fab"
+	          aria-label="Create a new job">
+		  <i class="fas fa-plus"></i>
+		</button>
+	{% endif %}
+	<div id="create-job-modal" class="modal" tabindex="-1" role="dialog">
+		<div class="modal-dialog" role="document">
+	    <div class="modal-content">
+	    	<div class="modal-header">
+	        <h4 class="modal-title">Create a new job</h5>
+	        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+	          <span aria-hidden="true">&times;</span>
+	        </button>
+	      </div>
+	    	<div class="modal-body">
+					{{ form(form) }}
+				</div>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block javascripts %}
+	{% cspscript %}
+	<script type="text/javascript">
+		$(function () {
+		  $('[data-toggle="tooltip"]').tooltip()
+		})
+
+		function onApiLoad() {
+			gapi.load('picker', onPickerApiLoad);
+		}
+
+		function onPickerApiLoad() {
+			$('#form_source_picker,#form_destination_picker').prop('disabled', false);
+		}
+
+		$('#form_source_picker').click((e) => createPicker(e.target, false));
+		$('#form_destination_picker').click((e) => createPicker(e.target, true));
+		function createPicker(button, enableTeamDrives) {
+			const pickerBuilder = new google.picker.PickerBuilder()
+				.enableFeature(google.picker.Feature.SUPPORT_TEAM_DRIVES)
+				.addView(new google.picker.DocsView()
+					.setIncludeFolders(true)
+					.setOwnedByMe(true)
+					.setMimeTypes('application/vnd.google-apps.folder')
+					.setSelectFolderEnabled(true)
+					.setEnableTeamDrives(enableTeamDrives))
+				.setAppId('45726243718')
+				.setRelayUrl(`${window.location.protocol}//${window.location.host}/rpc_relay`)
+				.setOrigin(`${window.location.protocol}//${window.location.host}`)
+				.setOAuthToken('{{ oauthToken }}')
+				.setDeveloperKey('{{ developerKey }}')
+				.setLocale('{{ app.request.getLocale() }}')
+				.setCallback((data) => {
+					onPicker(
+						$('#' + $(button).attr('id').replace(/picker/, 'folder')),
+						data);
+				});
+			if (!enableTeamDrives) {
+				pickerBuilder.enableFeature(google.picker.Feature.MINE_ONLY)
+			}
+			pickerBuilder.build().setVisible(true);
+		}
+
+		function onPicker(button, data) {
+			if (data && data[google.picker.Response.ACTION] == google.picker.Action.PICKED) {
+				const doc = data[google.picker.Response.DOCUMENTS][0];
+				const url = doc[google.picker.Document.ID];
+				button.val(url);
+			}	
+		}
+	</script>
+	{% endcspscript %}
+	<script type="text/javascript"
+	        src="https://apis.google.com/js/api.js?onload=onApiLoad"
+	        nonce="{{ csp_nonce('script') }}"></script>
+{% endblock %}
+
+{% block stylesheets %}
+	{% cspstyle %}
+	<style type="text/css">
+		.picker-dialog {
+			z-index: 1100 !important;
+		}
+
+		.app-fab {
+			position: fixed;
+			bottom: 0;
+			right: 0;
+			margin: 4rem;
+			border-radius: 50%;
+		}
+	</style>
+	{% endcspstyle %}
+	<!-- Hack for Drive Picker since it doesn't work with CSP. -->
+	{% cspstyle %}
+	<style type="text/css">
+		.picker-dialog-frame {
+			width: 100%;
+			height: 100%;
+			border: 0;
+			overflow: hidden
+		}
+
+		.picker-dialog-bg {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #fff;
+			z-index: 1000
+		}
+
+		.picker-dialog {
+			position: absolute;
+			top: 0;
+			left: 0;
+			background-color: #fff;
+			border: 1px solid #acacac;
+			width: auto;
+			padding: 0;
+			z-index: 1001;
+			overflow: auto;
+			-moz-box-shadow: rgba(0, 0, 0, .2) 0 4px 16px;
+			-webkit-box-shadow: rgba(0, 0, 0, .2) 0 4px 16px;
+			box-shadow: rgba(0, 0, 0, .2) 0 4px 16px
+		}
+
+		.picker-dialog-content {
+			font-size: 0;
+			padding: 0
+		}
+
+		.picker-dialog-title,
+		.picker-dialog-buttons {
+			display: none
+		}
+	</style>
+	{% endcspstyle %}
+{% endblock %}

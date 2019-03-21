@@ -1,0 +1,169 @@
+{#
+ # @license https://www.gnu.org/licenses/agpl-3.0.en.html AGPL-3.0+
+ #
+ # This file is part of Team Drive Migrator, an application for migrating
+ # files into Team Drives.
+ # Copyright (C) 2019  Anime Critics United, Inc. <webmaster@castlepointanime.com>
+ #
+ # This program is free software: you can redistribute it and/or modify
+ # it under the terms of the GNU Affero General Public License as
+ # published by the Free Software Foundation, either version 3 of the
+ # License, or (at your option) any later version.
+ #
+ # This program is distributed in the hope that it will be useful,
+ # but WITHOUT ANY WARRANTY; without even the implied warranty of
+ # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ # GNU Affero General Public License for more details.
+ #
+ # You should have received a copy of the GNU Affero General Public License
+ # along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ #}
+
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        <title>CPAC Team Drive Migrator: {% block title %}{% endblock %}</title>
+
+        <link rel="stylesheet"
+              href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+              integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" 
+              nonce="{{ csp_nonce('style') }}"
+              crossorigin="anonymous">
+        <link rel="stylesheet"
+              href="https://use.fontawesome.com/releases/v5.7.2/css/brands.css"
+              integrity="sha384-BKw0P+CQz9xmby+uplDwp82Py8x1xtYPK3ORn/ZSoe6Dk3ETP59WCDnX+fI1XCKK"
+              nonce="{{ csp_nonce('style') }}"
+              crossorigin="anonymous">
+        <link rel="stylesheet"
+              href="https://fonts.googleapis.com/css?family=Roboto:300,400,500"
+              nonce="{{ csp_nonce('style') }}"
+              crossorigin="anonymous">
+        <link rel="stylesheet"
+              href="https://use.fontawesome.com/releases/v5.8.1/css/svg-with-js.css"
+              integrity="sha384-acBDV8BDMPEP50gJeFdMIg9yE8eOPuFdBV9r+2F492NUbKhURdQvglFkG0Q+0rlE"
+              nonce="{{ csp_nonce('style') }}"
+              crossorigin="anonymous">
+
+        <!-- Custom Google logo stuff -->
+        {% cspstyle %}
+        <style type="text/css">
+            .google-login {
+                font-family: 'Roboto';
+                font-weight: 500;
+                font-size: 14px;
+                height: 40px;
+                padding: 10px 8px;
+            }
+            .google-login :nth-child(1) {
+                height: 18px;
+                width: 18px;
+                font-size: 18px;
+            }
+            .google-login .fa-google {
+                left: 0;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+            .google-login .fa-google path {
+                fill: url(#grad1);
+            }
+            .google-login .fa-google + .fa-google path {
+                fill: url(#grad2);
+            }
+            .google-login .fa-google + .fa-google {
+                clip-path: polygon(0% 0%, 120% 0%, 0% 75%);
+            }
+        </style>
+        {% endcspstyle %}
+        <!-- End Google stuff -->
+
+        {% block stylesheets %}{% endblock %}
+    </head>
+    <body>
+        <nav class="navbar navbar-expand-lg navbar-dark justify-content-between bg-dark">
+            <a class="navbar-brand" href="/">CPAC Team Drive Migrator</a>
+            {% if not is_granted('IS_AUTHENTICATED_FULLY') %}
+                <a class="btn btn-light shadow-sm text-uppercase text-black-50 google-login"
+                   href="{{ hwi_oauth_login_url('google') }}">
+                    <div class="d-inline-block position-relative mr-4 google-icon">
+                    <i class="fab fa-google position-absolute"></i>
+                        <i class="fab fa-google position-absolute"></i>
+                    </div>
+                    <span class="align-text-bottom">
+                        {{ 'google' | trans({}, 'HWIOAuthBundle') }}
+                    </span>
+                </a>
+            {% else %}
+                <div>
+                    {% if is_granted('ROLE_RUNNER') %}
+                        <a href="{{ url('job_new') }}" class="btn btn-primary shadow-sm">
+                            Jobs
+                        </a>
+                    {% endif %}
+                    <a href="{{ url('logout') }}" class="btn btn-light shadow-sm">
+                        Log out
+                    </a>
+                </div>
+            {% endif %}
+        </nav>
+        <div class="container my-4">
+            {% block breadcrumb %}{% endblock %}
+            {% set _title = block('title') %}
+            {% if _title is not empty %}
+                <h1>{{ _title | raw }}</h1>
+            {% endif %}
+            <div class="my-4">
+                {% block body %}{% endblock %}
+            </div>
+        </div>
+
+        <footer class="container-fluid my-5">
+            <div class="row text-center">
+                <div class="col-md">
+                    <a href="{{ path('terms') }}">Terms of Service</a>
+                </div>
+                <div class="col-md">
+                    <a href="{{ path('privacy') }}">Privacy Policy</a>
+                </div>
+                <div class="col-md">
+                    <a href="https://github.com/castlepointanime/team-drive-migrator">Source Code</a>
+                </div>
+            </div>
+        </footer>
+
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                nonce="{{ csp_nonce('script') }}"
+                crossorigin="anonymous"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+                integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+                nonce="{{ csp_nonce('script') }}" 
+                crossorigin="anonymous"></script>
+		<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+                integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+                nonce="{{ csp_nonce('script') }}" 
+                crossorigin="anonymous"></script>
+        <script src="https://use.fontawesome.com/releases/v5.8.0/js/all.js"
+                integrity="sha384-ukiibbYjFS/1dhODSWD+PrZ6+CGCgf8VbyUH7bQQNUulL+2r59uGYToovytTf4Xm"
+                nonce="{{ csp_nonce('script') }}"
+                crossorigin="anonymous"
+                data-auto-add-css="false"></script>
+        {% block javascripts %}{% endblock %}
+
+        <!-- Custom Google logo SVG stuff -->
+        <svg class="sr-only">
+          <defs>
+            <linearGradient id="grad1" x1="0%" y1="30%" x2="50%" y2="0%">
+              <stop offset="50%" stop-color="#34a853" />
+              <stop offset="50%" stop-color="#4285f4" />
+            </linearGradient>
+            <linearGradient id="grad2" x1="0%" y1="30%" x2="50%" y2="0%">
+              <stop offset="50%" stop-color="#fbbc05" />
+              <stop offset="50%" stop-color="#ea4335" />
+            </linearGradient>
+          </defs>
+        </svg>
+    </body>
+</html>

@@ -1,0 +1,58 @@
+nelmio_security:
+    # prevents framing of the entire site
+    clickjacking:
+        paths:
+            '^/.*': DENY
+
+    csp:
+        enabled: true
+        hosts: []
+        content_types: []
+        report_logger_service: monolog.logger.security
+        hash:
+            algorithm: sha512
+        enforce:
+            level1_fallback: true
+            browser_adaptive:
+                enabled: true
+            report-uri: "%router.request_context.base_url%/nelmio/csp/report"
+            default-src: ['self']
+            script-src:
+                - 'strict-dynamic'
+                - 'http:'
+                - 'https:'
+            style-src: 
+                - 'strict-dynamic'
+                - 'http:'
+                - 'https:'
+            frame-src: ['https://docs.google.com']
+            font-src: ['https://fonts.gstatic.com', 'https://use.fontawesome.com']
+            object-src: ['none']
+            base-uri: ['none']
+
+    # prevents redirections outside the website's domain
+    external_redirects:
+        abort: true
+        log: true
+        whitelist: ['accounts.google.com']
+
+    # disables content type sniffing for script resources
+    content_type:
+        nosniff: true
+
+    # forces Microsoft's XSS-Protection with
+    # its block mode
+    xss_protection:
+        enabled: true
+        mode_block: true
+
+    # Send a full URL in the `Referer` header when performing a same-origin request,
+    # only send the origin of the document to secure destination (HTTPS->HTTPS),
+    # and send no header to a less secure destination (HTTPS->HTTP).
+    # If `strict-origin-when-cross-origin` is not supported, use `no-referrer` policy,
+    # no referrer information is sent along with requests.
+    referrer_policy:
+        enabled: true
+        policies:
+            - 'no-referrer'
+            - 'strict-origin-when-cross-origin'

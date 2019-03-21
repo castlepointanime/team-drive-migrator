@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<xliff version="1.2" xmlns="urn:oasis:names:tc:xliff:document:1.2">
+	<file source-language="en"
+	      datatype="plaintext"
+	      original="file.ext">
+		<body>
+			<trans-unit id="name">
+				<source>Name</source>
+				<target>Name</target>
+			</trans-unit>
+			<trans-unit id="description">
+				<source>Description</source>
+				<target>Description</target>
+			</trans-unit>
+			<trans-unit id="pick_source_folder">
+				<source>Pick Source Folder</source>
+				<target>Pick Source Folder</target>
+			</trans-unit>
+			<trans-unit id="pick_destination_folder">
+				<source>Pick Destination Team Drive</source>
+				<target>Pick Destination Team Drive</target>
+			</trans-unit>
+			<trans-unit id="submit">
+				<source>Submit</source>
+				<target>Submit</target>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>
